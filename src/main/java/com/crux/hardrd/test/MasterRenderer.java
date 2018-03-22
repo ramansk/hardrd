@@ -8,6 +8,7 @@ import java.util.Map;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import com.crux.hardrd.Light;
 import com.crux.hardrd.entities.Camera;
@@ -21,6 +22,9 @@ public class MasterRenderer {
 	private static final float FieldOfViewFOV = 70;
 	private static final float NEAR_PLANE = 0.1f;
 	private static final float FAR_PLANE = 1000;
+	private static final float SKY_R = 0.5f;
+	private static final float SKY_G = 0.5f;
+	private static final float SKY_B = 1.5f;
 	private Matrix4f projectionMatrix;
 	private StaticShader shader = new StaticShader();
 	private EntityRenderer renderer;
@@ -50,12 +54,14 @@ public class MasterRenderer {
 	{
 		prepare();
 		shader.start();
+		shader.loadSkyColour(new Vector3f(SKY_R,SKY_G,SKY_B));
 		shader.loadLightColour(sun);
 		shader.loadViewMatrix(camera);
 		renderer.render(entities);
 		shader.stop();
 		
 		terrainShader.start();
+		terrainShader.loadSkyColour(new Vector3f(SKY_R,SKY_G,SKY_B));
 		terrainShader.loadLightColour(sun);
 		terrainShader.loadViewMatrix(camera);
 		terrainRenderer.render(terrains);
@@ -107,7 +113,7 @@ public class MasterRenderer {
 	public void prepare()
 	{
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glClearColor(0,0, 0, 1);
+		GL11.glClearColor(SKY_R,SKY_G, SKY_B, 1);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT|GL11.GL_DEPTH_BUFFER_BIT);
 	}
 	

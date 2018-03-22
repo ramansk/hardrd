@@ -1,6 +1,7 @@
 package com.crux.hardrd.shaders;
 
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import com.crux.hardrd.Light;
 import com.crux.hardrd.entities.Camera;
@@ -16,6 +17,7 @@ public class TerrainShader extends ShaderProgram {
 	private int loc_lightColour;
 	private int loc_shineDamper;
 	private int loc_reflectivity;
+	private int loc_skyColour;
 	public TerrainShader() {
 		super(VS_FILE, FS_FILE);
 	}
@@ -36,7 +38,13 @@ public class TerrainShader extends ShaderProgram {
 		loc_lightColour = super.getUniformLocation("lightColour");
 		loc_shineDamper = super.getUniformLocation("shineDamper");
 		loc_reflectivity = super.getUniformLocation("reflectivity");
+		loc_skyColour = super.getUniformLocation("skyColour");
 		
+	}
+	
+	public void loadSkyColour(Vector3f rgb)
+	{
+		super.loadVector(loc_skyColour, rgb);
 	}
 
 	public void loadShineDamper(float sd)
