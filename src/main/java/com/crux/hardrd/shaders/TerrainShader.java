@@ -6,9 +6,9 @@ import com.crux.hardrd.Light;
 import com.crux.hardrd.entities.Camera;
 import com.crux.hardrd.toolbox.Maths;
 
-public class StaticShader extends ShaderProgram {
-	private static final String VS_FILE = "vertexShader.txt";
-	private static final String FS_FILE = "fragmentShader.txt";
+public class TerrainShader extends ShaderProgram {
+	private static final String VS_FILE = "terrainVertexShader.txt";
+	private static final String FS_FILE = "terrainFragmentShader.txt";
 	private int loc_tm;
 	private int loc_pm;
 	private int loc_vm;
@@ -16,7 +16,7 @@ public class StaticShader extends ShaderProgram {
 	private int loc_lightColour;
 	private int loc_shineDamper;
 	private int loc_reflectivity;
-	public StaticShader() {
+	public TerrainShader() {
 		super(VS_FILE, FS_FILE);
 	}
 
