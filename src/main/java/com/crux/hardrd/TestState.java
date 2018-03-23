@@ -8,6 +8,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import com.crux.hardrd.entities.Camera;
 import com.crux.hardrd.entities.Entity;
+import com.crux.hardrd.entities.Player;
 import com.crux.hardrd.models.RawModel;
 import com.crux.hardrd.models.TexturedModel;
 import com.crux.hardrd.terrains.Terrain;
@@ -20,6 +21,7 @@ import com.crux.hardrd.textures.TerrainTexturePack;
 
 public class TestState extends State {
 	List<Entity> entities = new ArrayList<Entity>();
+	
 	Loader loader = new Loader();
 
 	TerrainTexture bt = new TerrainTexture(loader.loadTexture("grass"));
@@ -35,7 +37,7 @@ public class TestState extends State {
     Camera camera = new Camera();
     
     MasterRenderer masterRenderer = new MasterRenderer();
-
+    
     private Entity createEntity(float x, float z, String modelFileName, String textureFileName)
     {
     	RawModel model = OBJLoader.loadObjModel(modelFileName, loader);
@@ -47,6 +49,19 @@ public class TestState extends State {
     	return new Entity(tm, new Vector3f(x,0,z), 0, 90, 0, 1);
     	
     }
+    
+    private Player createPlayerEntity(float x, float z, String modelFileName, String textureFileName)
+    {
+    	RawModel model = OBJLoader.loadObjModel(modelFileName, loader);
+    	ModelTexture mt = new ModelTexture(loader.loadTexture(textureFileName));
+		mt.setShineDamper(10000);
+		mt.setReflectivity(0);
+    	TexturedModel tm = new TexturedModel(model, mt);
+    	
+    	return new Player(tm, new Vector3f(x,0,z), 0, 90, 0, 1);
+    	
+    }
+   
 	public TestState(GameStateManager gsm) {
 		super(gsm);
 		//mt21213.setShineDamper(10000);
@@ -65,12 +80,16 @@ public class TestState extends State {
 
 		entities.add(createEntity(30,30,"stall", "stallTexture"));	
 	}
+	
+	
+	Player player = createPlayerEntity(5,5, "tree", "tree");
 
 	@Override
 	public void update() {
 		//entity.increasePosition(0, 0, 0);
 		//entity.increaseRotation(0, 1, 0);
 		camera.move();
+		player.move();
 	 }
 
 	@Override
@@ -80,6 +99,7 @@ public class TestState extends State {
 		{
 			masterRenderer.processEntity(entity);
 		}
+		masterRenderer.processEntity(player);
 		masterRenderer.render(light, camera);
 	}
 

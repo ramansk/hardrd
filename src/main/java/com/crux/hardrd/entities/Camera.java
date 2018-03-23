@@ -18,7 +18,7 @@ public class Camera {
 	
 	public void move()
 	{	
-		if(Keyboard.isKeyDown(Keyboard.KEY_LEFT))
+	/*	if(Keyboard.isKeyDown(Keyboard.KEY_LEFT))
 		{
 			yaw-=cameraMoveSpeed;
 		}
@@ -48,7 +48,7 @@ public class Camera {
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
             position.y-=cameraMoveSpeed;
-        }
+        }*/
 	}
 
 	public Vector3f getPosition() {
