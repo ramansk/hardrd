@@ -34,7 +34,7 @@ public class TestState extends State {
 	
 	
 	Light light = new Light(new Vector3f(20000,20000,2000), new Vector3f(1,1,1));
-    Camera camera = new Camera();
+   
     
     MasterRenderer masterRenderer = new MasterRenderer();
     
@@ -83,7 +83,7 @@ public class TestState extends State {
 	
 	
 	Player player = createPlayerEntity(5,5, "tree", "tree");
-
+	 Camera camera = new Camera(player);
 	@Override
 	public void update() {
 		//entity.increasePosition(0, 0, 0);
