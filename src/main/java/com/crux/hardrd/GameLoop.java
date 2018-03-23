@@ -10,7 +10,6 @@ import org.lwjgl.opengl.PixelFormat;
 import com.crux.hardrd.GameStateManager;
 
 public class GameLoop {
-	// The window handle
 	private long window;
 	private GameStateManager gsm;
 
@@ -19,13 +18,13 @@ public class GameLoop {
 		init();
 		loop();
 	}
-	
+
 	private void init()
 	{
 		ContextAttribs attribs = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true);
 		
 		try {
-			Display.setDisplayMode(new DisplayMode(300,300));
+			Display.setDisplayMode(new DisplayMode(300, 300));
 			Display.create(new PixelFormat(), attribs);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
@@ -35,7 +34,7 @@ public class GameLoop {
 		gsm = new GameStateManager();
 	
 	}
-	
+
 	private void loop() {
 		while(!Display.isCloseRequested())
 		{
@@ -43,9 +42,7 @@ public class GameLoop {
 			draw();
 		}
 	}
-	
 
-	
 	private void update()
 	{
 		gsm.getCurrentState().update();

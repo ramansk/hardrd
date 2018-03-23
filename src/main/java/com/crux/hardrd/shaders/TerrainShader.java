@@ -18,6 +18,11 @@ public class TerrainShader extends ShaderProgram {
 	private int loc_shineDamper;
 	private int loc_reflectivity;
 	private int loc_skyColour;
+	private int loc_backgroundTexture;
+	private int loc_rTexture;
+	private int loc_gTexture;
+	private int loc_bTexture;
+	private int loc_blendMap;
 	public TerrainShader() {
 		super(VS_FILE, FS_FILE);
 	}
@@ -40,6 +45,20 @@ public class TerrainShader extends ShaderProgram {
 		loc_reflectivity = super.getUniformLocation("reflectivity");
 		loc_skyColour = super.getUniformLocation("skyColour");
 		
+		loc_backgroundTexture = super.getUniformLocation("backgroundTexture");
+		loc_rTexture = super.getUniformLocation("rTexture");
+		loc_gTexture = super.getUniformLocation("gTexture");
+		loc_bTexture = super.getUniformLocation("bTexture");
+		loc_blendMap = super.getUniformLocation("blendMap");
+	}
+	
+	public void connectTextureUnits()
+	{
+		super.loadI(loc_backgroundTexture, 0);
+		super.loadI(loc_rTexture, 1);
+		super.loadI(loc_gTexture, 2);
+		super.loadI(loc_bTexture, 3);
+		super.loadI(loc_blendMap, 4);
 	}
 	
 	public void loadSkyColour(Vector3f rgb)

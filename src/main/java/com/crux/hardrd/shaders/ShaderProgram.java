@@ -95,6 +95,11 @@ public abstract class ShaderProgram {
 		return shaderID;
 	}
 	
+	public void loadI(int loc, int val)
+	{
+		GL20.glUniform1i(loc, val);
+	}
+	
 	public void loadF(int loc, float val)
 	{
 		GL20.glUniform1f(loc, val);

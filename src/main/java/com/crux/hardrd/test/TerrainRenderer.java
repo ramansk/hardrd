@@ -12,7 +12,7 @@ import org.lwjgl.util.vector.Vector3f;
 import com.crux.hardrd.models.RawModel;
 import com.crux.hardrd.shaders.TerrainShader;
 import com.crux.hardrd.terrains.Terrain;
-import com.crux.hardrd.textures.ModelTexture;
+import com.crux.hardrd.textures.TerrainTexturePack;
 import com.crux.hardrd.toolbox.Maths;
 
 public class TerrainRenderer {
@@ -22,6 +22,7 @@ public class TerrainRenderer {
 		this.shader = shader;
 		shader.start();
 		shader.loadPrMatrix(projectionMatrix);
+		shader.connectTextureUnits();
 		shader.stop();
 	}
 	
@@ -44,20 +45,31 @@ public class TerrainRenderer {
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
 		GL20.glEnableVertexAttribArray(2);
+		bindTextures(terrain);
 		
-		ModelTexture texture = terrain.getTexture();
-		shader.loadReflectivity(texture.getReflectivity());
-		shader.loadShineDamper(texture.getShineDamper());
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		
-		
-		   GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-		   GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-		
-		
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getTextureID());
+
+		//ModelTexture texture = terrain.getTexture();
+		shader.loadReflectivity(0);
+		shader.loadShineDamper(10000);
+		//shader.loadReflectivity(texture.getReflectivity());
+		//shader.loadShineDamper(texture.getShineDamper());
 	}
 	
+	
+	private void bindTextures(Terrain terrain) {
+		TerrainTexturePack ttp = terrain.getTexturePack();
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, ttp.getBackgroundTexture().getTextureID());
+		GL13.glActiveTexture(GL13.GL_TEXTURE1);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, ttp.getrTexture().getTextureID());
+		GL13.glActiveTexture(GL13.GL_TEXTURE2);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, ttp.getgTexture().getTextureID());
+		GL13.glActiveTexture(GL13.GL_TEXTURE3);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, ttp.getbTexture().getTextureID());
+		GL13.glActiveTexture(GL13.GL_TEXTURE4);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, terrain.getBlendMap().getTextureID());
+
+	}
 	private void unbindTexturedModel()
 	{
 		GL20.glDisableVertexAttribArray(0);

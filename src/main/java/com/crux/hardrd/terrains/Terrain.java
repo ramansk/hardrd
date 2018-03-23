@@ -3,6 +3,8 @@ package com.crux.hardrd.terrains;
 import com.crux.hardrd.models.RawModel;
 import com.crux.hardrd.test.Loader;
 import com.crux.hardrd.textures.ModelTexture;
+import com.crux.hardrd.textures.TerrainTexture;
+import com.crux.hardrd.textures.TerrainTexturePack;
 
 public class Terrain {
 	private static final float SIZE = 800;
@@ -10,15 +12,33 @@ public class Terrain {
 	private float x;
 	private float z;
 	private RawModel model;
-	private ModelTexture texture;
+	private TerrainTexturePack texturePack;
+	private TerrainTexture blendMap;
 
-	public Terrain(float x, float z, Loader loader, ModelTexture texture) {
+	public Terrain(float x, float z, Loader loader, TerrainTexturePack texture, TerrainTexture blendMap) {
+		this.texturePack = texture;
+		this.blendMap = blendMap;
 		this.x = x;
 		this.z = z;
-		this.texture = texture;
 		this.model = generateTerrain(loader);
 	}
 	
+	public TerrainTexturePack getTexturePack() {
+		return texturePack;
+	}
+
+	public void setTexturePack(TerrainTexturePack texturePack) {
+		this.texturePack = texturePack;
+	}
+
+	public TerrainTexture getBlendMap() {
+		return blendMap;
+	}
+
+	public void setBlendMap(TerrainTexture blendMap) {
+		this.blendMap = blendMap;
+	}
+
 	private RawModel generateTerrain(Loader loader){
 		int count = VERTEX_COUNT * VERTEX_COUNT;
 		float[] vertices = new float[count * 3];
@@ -67,9 +87,5 @@ public class Terrain {
 
 	public RawModel getModel() {
 		return model;
-	}
-
-	public ModelTexture getTexture() {
-		return texture;
 	}
 }

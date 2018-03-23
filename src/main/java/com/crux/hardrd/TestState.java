@@ -15,16 +15,22 @@ import com.crux.hardrd.test.Loader;
 import com.crux.hardrd.test.MasterRenderer;
 import com.crux.hardrd.test.OBJLoader;
 import com.crux.hardrd.textures.ModelTexture;
+import com.crux.hardrd.textures.TerrainTexture;
+import com.crux.hardrd.textures.TerrainTexturePack;
 
 public class TestState extends State {
 	List<Entity> entities = new ArrayList<Entity>();
 	Loader loader = new Loader();
-	
 
+	TerrainTexture bt = new TerrainTexture(loader.loadTexture("grass"));
+	TerrainTexture r = new TerrainTexture(loader.loadTexture("dirt"));
+	TerrainTexture g = new TerrainTexture(loader.loadTexture("pinkFlowers"));
+	TerrainTexture b = new TerrainTexture(loader.loadTexture("path"));
+	TerrainTexturePack ttp = new TerrainTexturePack(bt, r, g, b);
+	TerrainTexture bm = new TerrainTexture(loader.loadTexture("blendMap"));
+	Terrain terrain = new Terrain(-100,-100, loader, ttp, bm);
 	
-
-	ModelTexture mt21213 =  new ModelTexture(loader.loadTexture("grass"));
-	Terrain terrain = new Terrain(-100,-100, loader, mt21213);
+	
 	Light light = new Light(new Vector3f(20000,20000,2000), new Vector3f(1,1,1));
     Camera camera = new Camera();
     
@@ -43,7 +49,7 @@ public class TestState extends State {
     }
 	public TestState(GameStateManager gsm) {
 		super(gsm);
-		mt21213.setShineDamper(10000);
+		//mt21213.setShineDamper(10000);
 		Random r = new Random();
 		for(int i = 0; i< 100; i++)
 		{
