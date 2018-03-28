@@ -1,26 +1,36 @@
 package com.crux.hardrd.terrains;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
+
 import com.crux.hardrd.models.RawModel;
 import com.crux.hardrd.test.Loader;
-import com.crux.hardrd.textures.ModelTexture;
 import com.crux.hardrd.textures.TerrainTexture;
 import com.crux.hardrd.textures.TerrainTexturePack;
+import com.crux.hardrd.toolbox.Maths;
 
 public class Terrain {
-	private static final float SIZE = 800;
-	private static final int VERTEX_COUNT = 128;
+	private static final float SIZE = 1800;
+	private static final float MAX_HEIGHT = 40;
+	private static final float MAX_PIXEL_COLOUR = 256*256*256;
 	private float x;
 	private float z;
 	private RawModel model;
 	private TerrainTexturePack texturePack;
 	private TerrainTexture blendMap;
-
-	public Terrain(float x, float z, Loader loader, TerrainTexturePack texture, TerrainTexture blendMap) {
+	private float [][] hights = null;
+	public Terrain(float x, float z, Loader loader, TerrainTexturePack texture, TerrainTexture blendMap, String imageName) {
 		this.texturePack = texture;
 		this.blendMap = blendMap;
 		this.x = x;
 		this.z = z;
-		this.model = generateTerrain(loader);
+		this.model = generateTerrain(loader, imageName);
 	}
 	
 	public TerrainTexturePack getTexturePack() {
@@ -38,8 +48,51 @@ public class Terrain {
 	public void setBlendMap(TerrainTexture blendMap) {
 		this.blendMap = blendMap;
 	}
-
-	private RawModel generateTerrain(Loader loader){
+	
+	public float getHeightOfTerrain(float worldX, float worldZ)
+	{
+		float terrainX = worldX - this.x;
+		float terrainZ = worldZ - this.z;
+		float gridSquareSize = SIZE / ((float)hights.length - 1);
+		
+		int gridX = (int) Math.floor(terrainX / gridSquareSize);
+		int gridZ = (int) Math.floor(terrainZ / gridSquareSize);
+		
+		if(gridX >= hights.length -1 || gridZ >= hights.length -1 || gridX < 0|| gridZ <0)
+		{
+			return 0;
+		}
+		
+		float xCoord = (terrainX % gridSquareSize)/gridSquareSize;
+		float zCoord = (terrainZ % gridSquareSize)/gridSquareSize;
+		float answer;
+		if (xCoord <= (1-zCoord)) {
+			answer = Maths
+					.barryCentric(new Vector3f(0, hights[gridX][gridZ], 0), new Vector3f(1,
+							hights[gridX + 1][gridZ], 0), new Vector3f(0,
+							hights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
+		} else {
+			answer = Maths
+					.barryCentric(new Vector3f(1, hights[gridX + 1][gridZ], 0), new Vector3f(1,
+							hights[gridX + 1][gridZ + 1], 1), new Vector3f(0,
+							hights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
+		}
+		
+		return answer;
+	}
+	
+	private RawModel generateTerrain(Loader loader, String heightMap){
+		
+		BufferedImage image = null;
+		
+		
+		try {
+			image = ImageIO.read(new File("res/" + heightMap + ".png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		int VERTEX_COUNT = image.getHeight();
+		hights = new float[VERTEX_COUNT][VERTEX_COUNT];
 		int count = VERTEX_COUNT * VERTEX_COUNT;
 		float[] vertices = new float[count * 3];
 		float[] normals = new float[count * 3];
@@ -49,7 +102,9 @@ public class Terrain {
 		for(int i=0;i<VERTEX_COUNT;i++){
 			for(int j=0;j<VERTEX_COUNT;j++){
 				vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * SIZE;
-				vertices[vertexPointer*3+1] = 0;
+				float height = getHeight(j,i,image);
+				hights[j][i] = height;
+				vertices[vertexPointer*3+1] = height;
 				vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * SIZE;
 				normals[vertexPointer*3] = 0;
 				normals[vertexPointer*3+1] = 1;
@@ -87,5 +142,18 @@ public class Terrain {
 
 	public RawModel getModel() {
 		return model;
+	}
+	
+	private float getHeight(int x, int z, BufferedImage image) {
+		if (x < 0 || x >= image.getHeight() || z < 0 || z >= image.getWidth()) {
+			return 0;
+		}
+		
+		float height = image.getRGB(x, z);
+		height += MAX_PIXEL_COLOUR/2f;
+		height /= MAX_PIXEL_COLOUR/2f;
+		height *= MAX_HEIGHT;
+
+		return height;		
 	}
 }

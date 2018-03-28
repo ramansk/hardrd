@@ -1,13 +1,16 @@
 package com.crux.hardrd.entities;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.lwjgl.util.vector.Vector3f;
 
 import com.crux.hardrd.models.TexturedModel;
 
+@XmlRootElement
 public class Entity {
 	private TexturedModel model;
-	private Vector3f position;
-	private float rotX, rotY, rotZ;
+	protected Vector3f position;
+	protected float rotX, rotY, rotZ;
 	private float scale;
 
 	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {

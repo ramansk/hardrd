@@ -1,106 +1,119 @@
 package com.crux.hardrd;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import com.crux.hardrd.controller.ApplicationController;
+import com.crux.hardrd.controller.PlayerResource;
+import com.crux.hardrd.controller.ServerUpdateJob;
+import com.crux.hardrd.controller.UpdateEventsQueue;
 import com.crux.hardrd.entities.Camera;
+import com.crux.hardrd.entities.DynamicEntity;
 import com.crux.hardrd.entities.Entity;
 import com.crux.hardrd.entities.Player;
-import com.crux.hardrd.models.RawModel;
-import com.crux.hardrd.models.TexturedModel;
 import com.crux.hardrd.terrains.Terrain;
-import com.crux.hardrd.test.Loader;
 import com.crux.hardrd.test.MasterRenderer;
-import com.crux.hardrd.test.OBJLoader;
-import com.crux.hardrd.textures.ModelTexture;
-import com.crux.hardrd.textures.TerrainTexture;
-import com.crux.hardrd.textures.TerrainTexturePack;
 
 public class TestState extends State {
-	List<Entity> entities = new ArrayList<Entity>();
 	
-	Loader loader = new Loader();
+	private List<Entity> entities;
+	private Player player;
+	private Camera camera;
+	private Light light;
+	private Terrain terrain;
+    private MasterRenderer masterRenderer;
+    
+    private Map<String, DynamicEntity> otherPlayers = new ConcurrentHashMap<>();
+    private List<PlayerResource> playersToAdd = new CopyOnWriteArrayList<>();
+    
+    
+    private ServerUpdateJob job;
+    private OtherPlayersUpdateJob opuJob;
 
-	TerrainTexture bt = new TerrainTexture(loader.loadTexture("grass"));
-	TerrainTexture r = new TerrainTexture(loader.loadTexture("dirt"));
-	TerrainTexture g = new TerrainTexture(loader.loadTexture("pinkFlowers"));
-	TerrainTexture b = new TerrainTexture(loader.loadTexture("path"));
-	TerrainTexturePack ttp = new TerrainTexturePack(bt, r, g, b);
-	TerrainTexture bm = new TerrainTexture(loader.loadTexture("blendMap"));
-	Terrain terrain = new Terrain(-100,-100, loader, ttp, bm);
-	
-	
-	Light light = new Light(new Vector3f(20000,20000,2000), new Vector3f(1,1,1));
-   
-    
-    MasterRenderer masterRenderer = new MasterRenderer();
-    
-    private Entity createEntity(float x, float z, String modelFileName, String textureFileName)
-    {
-    	RawModel model = OBJLoader.loadObjModel(modelFileName, loader);
-    	ModelTexture mt = new ModelTexture(loader.loadTexture(textureFileName));
-		mt.setShineDamper(10000);
-		mt.setReflectivity(0);
-    	TexturedModel tm = new TexturedModel(model, mt);
-    	
-    	return new Entity(tm, new Vector3f(x,0,z), 0, 90, 0, 1);
-    	
-    }
-    
-    private Player createPlayerEntity(float x, float z, String modelFileName, String textureFileName)
-    {
-    	RawModel model = OBJLoader.loadObjModel(modelFileName, loader);
-    	ModelTexture mt = new ModelTexture(loader.loadTexture(textureFileName));
-		mt.setShineDamper(10000);
-		mt.setReflectivity(0);
-    	TexturedModel tm = new TexturedModel(model, mt);
-    	
-    	return new Player(tm, new Vector3f(x,0,z), 0, 90, 0, 1);
-    	
-    }
-   
-	public TestState(GameStateManager gsm) {
-		super(gsm);
-		//mt21213.setShineDamper(10000);
-		Random r = new Random();
-		for(int i = 0; i< 100; i++)
-		{
-			Entity grass = createEntity(r.nextFloat()*500,r.nextFloat()*500,"grassModel", "grassTexture");
-			grass.getModel().getTexture().setHasTransparency(true);
-			grass.getModel().getTexture().setUseFakeLighting(true);
-			entities.add(grass);
-			entities.add(createEntity(r.nextFloat()*500,r.nextFloat()*500,"lowPolyTree", "lowPolyTree"));
-			///entities.add(createEntity(r.nextFloat()*500,r.nextFloat()*500,"grassModel", "flower"));
-			//entities.add(createEntity(r.nextFloat()*500,r.nextFloat()*500,"grassModel", "fern"));
-			//entities.add(createEntity(r.nextFloat()*500,r.nextFloat()*500,"grassModel", "grassy"));
-		}
-
-		entities.add(createEntity(30,30,"stall", "stallTexture"));	
+	public TestState(ApplicationController controller) {
+		super(controller);
+		job = new ServerUpdateJob(controller);
+		opuJob = new OtherPlayersUpdateJob(otherPlayers, controller, playersToAdd);
+		light = new Light(new Vector3f(20000,20000,2000), new Vector3f(1,1,1));
+		masterRenderer = new MasterRenderer();
 	}
-	
-	
-	Player player = createPlayerEntity(5,5, "tree", "tree");
-	 Camera camera = new Camera(player);
+
+	@Override
+	public void applyStaticEntities(List<Entity> entity) {
+		this.entities = entity;		
+	}
+
+	@Override
+	public void applyPlayer(Player player) {
+		this.player = player;
+		camera = new Camera(player);
+		
+	}
+
+	@Override
+	public void applyTerrain(Terrain terrain) {
+		this.terrain = terrain;
+	}
+	private long lastUpdateTime;
 	@Override
 	public void update() {
+		if(!playersToAdd.isEmpty())
+		{
+			for(PlayerResource player: playersToAdd)
+			{
+				System.out.println(player.getCurrentSpeed());
+				DynamicEntity pe = controller.createDynamicEntity(controller.getLoader(), terrain, player.getPosX(),player.getPosZ(),"lowPolyTree", "lowPolyTree", player.getCurrentSpeed());
+
+				otherPlayers.put(player.getName(), pe);
+				playersToAdd.remove(player);
+			}
+		}
+		for(DynamicEntity dynamicPlayerEntity : otherPlayers.values())
+		{
+			dynamicPlayerEntity.increasePosition(60, 2);
+		}
 		//entity.increasePosition(0, 0, 0);
 		//entity.increaseRotation(0, 1, 0);
 		camera.move();
-		player.move();
+		player.move(terrain);
+		
+		if(System.currentTimeMillis() > (lastUpdateTime + 500l))
+		{
+			//controller.retrieveDynamicDataUpdates();
+			UpdateEventsQueue.put(new Updates(
+					"test2", 
+					player.getPosition().x,
+					player.getPosition().y,
+					player.getPosition().z,
+					player.getRotX(),
+					player.getRotY(),
+					player.getRotZ(),
+					player.getCurrentSpeed()
+					));
+			//System.out.println(UpdateEventsQueue.size());
+			lastUpdateTime = System.currentTimeMillis();
+		}
 	 }
 
 	@Override
-	public void draw(long window) {
+	public void draw() {
+		Random rand = new Random();
+		//entities.add(controller.createEntity(controller.getLoader(), terrain, rand.nextFloat()*500,rand.nextFloat()*500,"lowPolyTree", "lowPolyTree"));
 		masterRenderer.processEntity(terrain);
 		for(Entity entity : entities)
 		{
 			masterRenderer.processEntity(entity);
 		}
+		for(Entity p : otherPlayers.values())
+		{
+			masterRenderer.processEntity(p);
+		}
 		masterRenderer.processEntity(player);
 		masterRenderer.render(light, camera);
 	}
-
 }

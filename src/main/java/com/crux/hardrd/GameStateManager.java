@@ -1,21 +1,23 @@
 package com.crux.hardrd;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.crux.hardrd.controller.ApplicationController;
 
 public class GameStateManager {
 	private State currentState;
-	private List<State> states;
+	private Map<String, State> states;
 	
-	public GameStateManager()
+	public GameStateManager(ApplicationController controller)
 	{
-		states = new ArrayList<>();
-		State tst = new TestState(this);
-		states.add(tst);
+		states = new HashMap<>();
+		State tst = new TestState(controller);
+		states.put("main", tst);
 		setCurrentState(tst);
 	}
 
-	public void setStates(List<State> states) {
+	public void setStates(Map<String, State> states) {
 		this.states = states;
 	}
 
@@ -26,8 +28,9 @@ public class GameStateManager {
 	public void setCurrentState(State currentState) {
 		this.currentState = currentState;
 	}
-
-	public List<State> getStates() {
-		return states;
+	
+	public State getState(String key)
+	{
+		return states.get(key);
 	}
 }

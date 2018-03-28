@@ -17,19 +17,17 @@ import com.crux.hardrd.toolbox.Maths;
 
 public class TerrainRenderer {
 	private TerrainShader shader;
-	public TerrainRenderer(TerrainShader shader, Matrix4f projectionMatrix)
-	{
+
+	public TerrainRenderer(TerrainShader shader, Matrix4f projectionMatrix) {
 		this.shader = shader;
 		shader.start();
 		shader.loadPrMatrix(projectionMatrix);
 		shader.connectTextureUnits();
 		shader.stop();
 	}
-	
-	public void render(List<Terrain> terrains)
-	{
-		for(Terrain t : terrains)
-		{
+
+	public void render(List<Terrain> terrains) {
+		for (Terrain t : terrains) {
 			prepareTerrain(t);
 			loadModelMatrix(t);
 			GL11.glDrawElements(GL11.GL_TRIANGLES, t.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
@@ -37,25 +35,22 @@ public class TerrainRenderer {
 			unbindTexturedModel();
 		}
 	}
-	
-	private void prepareTerrain(Terrain terrain)
-	{
+
+	private void prepareTerrain(Terrain terrain) {
 		RawModel model = terrain.getModel();
 		GL30.glBindVertexArray(model.getVaoID());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
 		GL20.glEnableVertexAttribArray(2);
 		bindTextures(terrain);
-		
 
-		//ModelTexture texture = terrain.getTexture();
+		// ModelTexture texture = terrain.getTexture();
 		shader.loadReflectivity(0);
 		shader.loadShineDamper(10000);
-		//shader.loadReflectivity(texture.getReflectivity());
-		//shader.loadShineDamper(texture.getShineDamper());
+		// shader.loadReflectivity(texture.getReflectivity());
+		// shader.loadShineDamper(texture.getShineDamper());
 	}
-	
-	
+
 	private void bindTextures(Terrain terrain) {
 		TerrainTexturePack ttp = terrain.getTexturePack();
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -70,16 +65,15 @@ public class TerrainRenderer {
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, terrain.getBlendMap().getTextureID());
 
 	}
-	private void unbindTexturedModel()
-	{
+
+	private void unbindTexturedModel() {
 		GL20.glDisableVertexAttribArray(0);
 		GL20.glDisableVertexAttribArray(1);
 		GL20.glEnableVertexAttribArray(2);
 		GL30.glBindVertexArray(0);
 	}
-	
-	private void loadModelMatrix(Terrain terrain)
-	{
+
+	private void loadModelMatrix(Terrain terrain) {
 		Matrix4f trM = Maths.createTrMatrix(new Vector3f(terrain.getX(), 0, terrain.getZ()), 0, 0, 0, 1);
 		shader.loadTrMatrix(trM);
 

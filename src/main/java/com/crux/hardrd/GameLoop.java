@@ -2,41 +2,26 @@ package com.crux.hardrd;
 
 import org.lwjgl.opengl.Display;
 
-import com.crux.hardrd.GameStateManager;
+import com.crux.hardrd.controller.ApplicationController;
 
 public class GameLoop {
-	private long window;
-	private GameStateManager gsm;
+	private ApplicationController applicatonController;
 
-	public void run()
-	{
+	public void run() {
 		init();
 		loop();
 	}
 
-	private void init()
-	{	
+	private void init() {
 		DisplayManager.createDisplay();
-		gsm = new GameStateManager();
+		applicatonController = new ApplicationController();
 	}
 
 	private void loop() {
-		while(!Display.isCloseRequested())
-		{
-			update();
-			draw();
+		applicatonController.loadResources();
+		while (!Display.isCloseRequested()) {
+			applicatonController.updateState();
 		}
 		DisplayManager.close();
-	}
-
-	private void update()
-	{
-		gsm.getCurrentState().update();
-		DisplayManager.update();		
-	}
-
-	private void draw()
-	{
-		gsm.getCurrentState().draw(window);
 	}
 }
