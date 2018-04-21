@@ -7,4 +7,5 @@ import com.crux.hardrd.Updates;
 public interface Client {
 	void sendUpdatesToServer(Updates updates);
 	List<PlayerResource> getPlayersFromServer();
+	MapResource getMap(Integer id);
 }

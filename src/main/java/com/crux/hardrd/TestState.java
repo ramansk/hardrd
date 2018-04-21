@@ -86,7 +86,7 @@ public class TestState extends State {
 		{
 			//controller.retrieveDynamicDataUpdates();
 			UpdateEventsQueue.put(new Updates(
-					"test2", 
+					"test4", 
 					player.getPosition().x,
 					player.getPosition().y,
 					player.getPosition().z,

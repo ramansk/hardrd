@@ -65,7 +65,7 @@ public class ApplicationController {
 		TerrainTexture b = new TerrainTexture(loader.loadTexture("path"));
 		TerrainTexturePack ttp = new TerrainTexturePack(bt, r, g, b);
 		TerrainTexture bm = new TerrainTexture(loader.loadTexture("blendMap"));
-		Terrain terrain = new Terrain(-100,-100, loader, ttp, bm,"heightmap");
+		Terrain terrain = new Terrain(-100,-100, loader, ttp, bm, client.getMap(1));
 		
 		Player player = createPlayerEntity(loader, 5,5, "tree", "tree");
 		

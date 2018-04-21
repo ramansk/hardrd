@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import com.crux.hardrd.controller.MapResource;
 import com.crux.hardrd.models.RawModel;
 import com.crux.hardrd.test.Loader;
 import com.crux.hardrd.textures.TerrainTexture;
@@ -31,6 +32,38 @@ public class Terrain {
 		this.x = x;
 		this.z = z;
 		this.model = generateTerrain(loader, imageName);
+	}
+	
+	
+	public Terrain(float x, float z, Loader loader, TerrainTexturePack texture, TerrainTexture blendMap,
+			MapResource map) {
+		this.texturePack = texture;
+		this.blendMap = blendMap;
+		this.x = x;
+		this.z = z;
+		this.hights = map.getHeights();
+		this.model = loader.loadToVAO(toPrimitiveFloat(map.getVertices()), toPrimitiveFloat(map.getTextureCoords()),
+				toPrimitiveFloat(map.getNormals()), toPrimitiveInt(map.getIndices()));
+	}
+	
+	float[] toPrimitiveFloat(Float[] f) {
+		float[] fr = new float[f.length];
+		for(int i = 0; i <f.length; i++)
+		{
+			fr[i] = f[i];
+		}
+
+	    return fr;
+	}
+	
+	int[] toPrimitiveInt(Integer[] intArray) {
+		int[] fr = new int[intArray.length];
+		for(int i = 0; i <intArray.length; i++)
+		{
+			fr[i] = intArray[i];
+		}
+
+	    return fr;
 	}
 	
 	public TerrainTexturePack getTexturePack() {

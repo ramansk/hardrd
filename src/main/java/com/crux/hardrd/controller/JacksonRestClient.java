@@ -43,4 +43,13 @@ public class JacksonRestClient implements Client {
 
 		return players;
 	}
+
+	@Override
+	public MapResource getMap(Integer id) {
+		Response response = webTarget.path("/getTerrain/").path(id.toString()).request().get(Response.class);
+		MapResource map = response.readEntity(new GenericType<MapResource>() {
+		});
+
+		return map;
+	}
 }
