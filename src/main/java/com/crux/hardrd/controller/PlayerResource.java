@@ -122,7 +122,6 @@ public class PlayerResource {
 		{
 			this.currentSpeed = 0f;
 		} else {
-			System.out.println(currentSpeed);
 			this.currentSpeed = currentSpeed;
 		}
 	}

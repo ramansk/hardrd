@@ -17,9 +17,32 @@ import com.crux.hardrd.textures.TerrainTexturePack;
 import com.crux.hardrd.toolbox.Maths;
 
 public class Terrain {
-	private static final float SIZE = 1800;
+	public static final float SIZE = 1800;
 	private static final float MAX_HEIGHT = 40;
 	private static final float MAX_PIXEL_COLOUR = 256*256*256;
+	
+	private int row;
+	private int col;
+	
+	public int getRow() {
+		return row;
+	}
+
+
+	public void setRow(int row) {
+		this.row = row;
+	}
+
+
+	public int getCol() {
+		return col;
+	}
+
+
+	public void setCol(int col) {
+		this.col = col;
+	}
+
 	private float x;
 	private float z;
 	private RawModel model;
@@ -37,6 +60,8 @@ public class Terrain {
 	
 	public Terrain(float x, float z, Loader loader, TerrainTexturePack texture, TerrainTexture blendMap,
 			MapResource map) {
+		this.col = map.getCol();
+		this.row = map.getRow();
 		this.texturePack = texture;
 		this.blendMap = blendMap;
 		this.x = x;

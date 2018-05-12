@@ -43,20 +43,16 @@ public class DynamicEntity extends Entity{
 		float distance = 10*0.5f;
 		float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
 		float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
-		//System.out.println(dx + " " + dz);
 		
 		
-		//System.out.println(curPosition.x + " " + prevPosition.x);
-		//System.out.println(nextPosition.x + " " + super.position.x);
+
 		if(currentSpeed != 0)
 		{
-			System.out.println("x");
 			super.position.x += dx / numFramesPerTick;
 		}
 
 		if(currentSpeed != 0)
 		{
-			System.out.println("z");
 			super.position.z += dz / numFramesPerTick;
 		}
 	}
@@ -80,7 +76,6 @@ public class DynamicEntity extends Entity{
 		curPosition = position;
 		if(currentSpeed != 0)
 		{
-			System.out.println(currentSpeed);
 			float distance = 10*0.5f;
 			float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
 			float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));

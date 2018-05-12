@@ -1,36 +1,34 @@
 package com.crux.hardrd;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.crux.hardrd.controller.ApplicationController;
 
 public class GameStateManager {
 	private State currentState;
-	private Map<String, State> states;
-	
+	private ApplicationController controller;
 	public GameStateManager(ApplicationController controller)
 	{
-		states = new HashMap<>();
-		State tst = new TestState(controller);
-		states.put("main", tst);
-		setCurrentState(tst);
+		this.controller = controller;
+		loadState("menu");
 	}
 
-	public void setStates(Map<String, State> states) {
-		this.states = states;
-	}
-
-	public State getCurrentState() {
-		return currentState;
-	}
-
-	public void setCurrentState(State currentState) {
-		this.currentState = currentState;
+	public void setCurrentState(String state) {
+		currentState.cleanUp();
+		loadState(state);
 	}
 	
-	public State getState(String key)
+	private void loadState(String state) {
+		switch (state) {
+		case "menu":
+			currentState = new MenuState(controller);
+			break;
+		case "test":
+			currentState = new MultiplayerGameState(controller);
+			break;
+		}
+	}
+	
+	public State getCurrentState()
 	{
-		return states.get(key);
+		return currentState;
 	}
 }

@@ -27,7 +27,6 @@ public class JacksonRestClient implements Client {
 	@Override
 	public void sendUpdatesToServer(Updates updates) {
 		try {
-			System.out.println(updates.getCurrentSpeed());
 			String res = webTarget.path("/update").request().post(Entity.json(updates)).readEntity(String.class);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -45,11 +44,17 @@ public class JacksonRestClient implements Client {
 	}
 
 	@Override
-	public MapResource getMap(Integer id) {
-		Response response = webTarget.path("/getTerrain/").path(id.toString()).request().get(Response.class);
+	public MapResource getMap(int colNum, int rowNum) {
+		Response response = webTarget
+				.path("/getTerrain").path(String.valueOf(colNum)).path(String.valueOf(rowNum))
+				//.queryParam("colNum", colNum)
+				//.queryParam("rowNum", rowNum)
+				.request()
+				.get(Response.class);
 		MapResource map = response.readEntity(new GenericType<MapResource>() {
 		});
 
 		return map;
+
 	}
 }

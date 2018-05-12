@@ -20,4 +20,6 @@ public abstract class State {
 	public abstract void applyStaticEntities(List<Entity> entity);
 	public abstract void applyPlayer(Player player);
 	public abstract void applyTerrain(Terrain terrain);
+	
+	public abstract void cleanUp();
 }
