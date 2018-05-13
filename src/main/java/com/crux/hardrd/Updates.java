@@ -9,6 +9,7 @@ public class Updates {
 	private float playerRotY;
 	private float playerRotZ;
 	private float currentSpeed;
+	private String username;
 
 	public float getCurrentSpeed() {
 		return currentSpeed;
@@ -25,6 +26,14 @@ public class Updates {
 		this.playerRotY = playerRotY;
 		this.playerRotZ = playerRotZ;
 		this.currentSpeed = currentSpeed;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getPlayerId() {

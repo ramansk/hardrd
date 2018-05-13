@@ -3,6 +3,10 @@ package com.crux.hardrd;
 import java.io.File;
 import java.util.List;
 
+import com.crux.hardrd.controller.PlayerResource;
+import com.crux.hardrd.controller.UserResource;
+import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.listbox.builder.ListBoxBuilder;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -44,7 +48,9 @@ import de.lessvoid.nifty.screen.ScreenController;
 import de.lessvoid.nifty.spi.time.impl.AccurateTimeProvider;
 import de.lessvoid.nifty.tools.Color;
 import de.lessvoid.nifty.tools.SizeValue;
-
+//TODO:Add Error Flow
+//TODO: Refactor class
+//TODO: Add "back" flow
 public class MenuState extends State{
 	private static final float SKY_R = 0.5f;
 	private static final float SKY_G = 0.5f;
@@ -78,6 +84,8 @@ public class MenuState extends State{
 		 chooseServerOperationsScreen(nifty, new MyScreenController());
 		 loginScreen(nifty, new MyScreenController());
 		 playerManagementScreen(nifty, new MyScreenController());
+        registerScreen(nifty, new MyScreenController());
+        createPlayerScreen(nifty, new MyScreenController());
 		 nifty.gotoScreen("start");
 	}
 	
@@ -260,6 +268,18 @@ public class MenuState extends State{
 		          panel(new PanelBuilder(){{
 		            height(SizeValue.px(10));
 		          }});
+                    control(new ListBoxBuilder("avaliablePlayersListBox") {{
+                        displayItems(4);
+                        selectionModeMutliple();
+                        optionalHorizontalScrollbar();
+                        optionalVerticalScrollbar();
+                        width("*"); // standard nifty width attribute
+                    }});
+                    control(new ButtonBuilder("createPlayer", "Create User") {{
+                        marginTop("10");
+                        alignCenter();
+                        valignCenter();
+                    }});
 		          control(new ButtonBuilder("play", "Play For The Selected Player") {{
 		            alignCenter();
 		            valignCenter();
@@ -319,10 +339,155 @@ public class MenuState extends State{
 			            alignCenter();
 			            valignCenter();
 			          }});
+                    control(new ButtonBuilder("register", "Register") {{
+                        marginTop("10");
+                        alignCenter();
+                        valignCenter();
+                    }});
 		        }});
 		      }});
 		    }}.build(nifty);
 		  }
+
+    private static Screen registerScreen(final Nifty nifty, final ScreenController controller) {
+        return new ScreenBuilder("register") {{
+            controller(controller);
+            layer(new LayerBuilder("layer") {{
+                childLayoutCenter();
+                onStartScreenEffect(new EffectBuilder("fade") {{
+                    length(500);
+                    effectParameter("start", "#0");
+                    effectParameter("end", "#f");
+                }});
+                onEndScreenEffect(new EffectBuilder("fade") {{
+                    length(500);
+                    effectParameter("start", "#f");
+                    effectParameter("end", "#0");
+                }});
+                onActiveEffect(new EffectBuilder("gradient") {{
+                    effectValue("offset", "0%", "color", "#333f");
+                    effectValue("offset", "100%", "color", "#ffff");
+                }});
+                panel(new PanelBuilder() {{
+                    childLayoutVertical();
+                    text(new TextBuilder() {{
+                        text("Server Operations");
+                        style("base-font");
+                        color(Color.BLACK);
+                        alignCenter();
+                        valignCenter();
+                    }});
+                    panel(new PanelBuilder(){{
+                        height(SizeValue.px(10));
+                    }});
+
+                    text(new TextBuilder() {{
+                        text("Username");
+                        style("base-font");
+                        color(Color.BLACK);
+                        alignCenter();
+                        valignCenter();
+                    }});
+                    control(new TextFieldBuilder("username", "username") {{ // init with the text "*"
+                        maxLength(10); // force only a single character input
+                        width("100px");
+                        alignCenter();
+                        valignCenter();
+                    }});
+                    text(new TextBuilder() {{
+                        text("Password");
+                        style("base-font");
+                        color(Color.BLACK);
+                        alignCenter();
+                        valignCenter();
+                    }});
+                    control(new TextFieldBuilder("password") {{ // init with the text "*"
+                        maxLength(10); // force only a single character input
+                        passwordChar('*');
+                        width("100px");
+                        alignCenter();
+                        valignCenter();
+                    }});
+                    text(new TextBuilder() {{
+                        text("Repeat Pasword");
+                        style("base-font");
+                        color(Color.BLACK);
+                        alignCenter();
+                        valignCenter();
+                    }});
+                    control(new TextFieldBuilder("passwordRepeat") {{ // init with the text "*"
+                        maxLength(10); // force only a single character input
+                        passwordChar('*');
+                        width("100px");
+                        alignCenter();
+                        valignCenter();
+                    }});
+                    control(new ButtonBuilder("registerEnd", "Register") {{
+                        marginTop("20");
+                        alignCenter();
+                        valignCenter();
+                    }});
+                }});
+            }});
+        }}.build(nifty);
+    }
+
+
+    private static Screen createPlayerScreen(final Nifty nifty, final ScreenController controller) {
+        return new ScreenBuilder("createPlayer") {{
+            controller(controller);
+            layer(new LayerBuilder("layer") {{
+                childLayoutCenter();
+                onStartScreenEffect(new EffectBuilder("fade") {{
+                    length(500);
+                    effectParameter("start", "#0");
+                    effectParameter("end", "#f");
+                }});
+                onEndScreenEffect(new EffectBuilder("fade") {{
+                    length(500);
+                    effectParameter("start", "#f");
+                    effectParameter("end", "#0");
+                }});
+                onActiveEffect(new EffectBuilder("gradient") {{
+                    effectValue("offset", "0%", "color", "#333f");
+                    effectValue("offset", "100%", "color", "#ffff");
+                }});
+                panel(new PanelBuilder() {{
+                    childLayoutVertical();
+                    text(new TextBuilder() {{
+                        text("Server Operations");
+                        style("base-font");
+                        color(Color.BLACK);
+                        alignCenter();
+                        valignCenter();
+                    }});
+                    panel(new PanelBuilder(){{
+                        height(SizeValue.px(10));
+                    }});
+
+                    text(new TextBuilder() {{
+                        text("Player Name");
+                        style("base-font");
+                        color(Color.BLACK);
+                        alignCenter();
+                        valignCenter();
+                    }});
+                    control(new TextFieldBuilder("playername") {{ // init with the text "*"
+                        maxLength(10); // force only a single character input
+                        width("100px");
+                        alignCenter();
+                        valignCenter();
+                    }});
+
+                    control(new ButtonBuilder("createPlayerEnd", "Create") {{
+                        marginTop("20");
+                        alignCenter();
+                        valignCenter();
+                    }});
+                }});
+            }});
+        }}.build(nifty);
+    }
 	
 	 private LwjglInputSystem initInput() {
 		    LwjglInputSystem inputSystem = new LwjglInputSystem();
@@ -411,7 +576,16 @@ public class MenuState extends State{
 	    // input.shutdown();
 	     //input.shutdown();
 	    }
-	  
+        @NiftyEventSubscriber(id="play")
+        public void play(final String id, final ButtonClickedEvent event) {
+
+            ListBox listBox = nifty.getCurrentScreen().findNiftyControl("avaliablePlayersListBox", ListBox.class);
+            System.out.println(listBox.getFocusItem());
+            controller.setCurrentPlayerId(String.valueOf(listBox.getFocusItem()));
+            nifty.exit();
+            controller.getGsm().setCurrentState("test");
+            //input.shutdown();
+        }
 	
 	   @NiftyEventSubscriber(id="singleplayer")
 	    public void singleplayer(final String id, final ButtonClickedEvent event) {
@@ -453,17 +627,77 @@ public class MenuState extends State{
 	    // input.shutdown();
 	     //input.shutdown();
 	    }
+        @NiftyEventSubscriber(id="createPlayer")
+        public void createPlayer(final String id, final ButtonClickedEvent event) {
+
+            nifty.gotoScreen("createPlayer");
+            //nifty.exit();
+            // controller.getGsm().setCurrentState("test");
+            // input.shutdown();
+            //input.shutdown();
+        }
+
 	   
 	   @NiftyEventSubscriber(id="login")
 	    public void login(final String id, final ButtonClickedEvent event) {
-	    
+
 		   nifty.gotoScreen("serverLogIn");
 	     //nifty.exit();
 	    // controller.getGsm().setCurrentState("test");
 	    // input.shutdown();
 	     //input.shutdown();
 	    }
-	   
+
+        @NiftyEventSubscriber(id="register")
+        public void  register(final String id, final ButtonClickedEvent event) {
+
+            nifty.gotoScreen("register");
+            //nifty.exit();
+            // controller.getGsm().setCurrentState("test");
+            // input.shutdown();
+            //input.shutdown();
+        }
+
+        @NiftyEventSubscriber(id="registerEnd")
+        public void  registerEnd(final String id, final ButtonClickedEvent event) {
+            //TODO: Add "Register completed window" or something like this.
+
+            TextField un = nifty.getCurrentScreen().findNiftyControl("username", TextField.class);
+            //TODO:Add Passrowd validation ( first password must be equal with second password".
+
+            TextField psw = nifty.getCurrentScreen().findNiftyControl("password", TextField.class);
+            TextField pswRepeat = nifty.getCurrentScreen().findNiftyControl("password", TextField.class);
+
+
+            controller.register(un.getRealText(), psw.getRealText());
+            nifty.gotoScreen("serverLogIn");
+            //nifty.exit();
+            // controller.getGsm().setCurrentState("test");
+            // input.shutdown();
+            //input.shutdown();
+        }
+
+        @NiftyEventSubscriber(id="createPlayerEnd")
+        public void  createPlayerEnd(final String id, final ButtonClickedEvent event) {
+            //TODO: Add "Register completed window" or something like this.
+
+            TextField un = nifty.getCurrentScreen().findNiftyControl("playername", TextField.class);
+            //TODO:Add Passrowd validation ( first password must be equal with second password".
+            Updates u = new Updates(un.getRealText(), 2700f,0f,2700f,0f,0f,0f, 0f);
+            u.setUsername(nifty.getScreen("serverLogIn").findNiftyControl("username", TextField.class).getRealText());
+            System.out.println(nifty.getScreen("serverLogIn").findNiftyControl("username", TextField.class).getRealText());
+            controller.createPlayer(u);
+            ListBox listBox = nifty.getScreen("playerManagement").findNiftyControl("avaliablePlayersListBox", ListBox.class);
+            listBox.addItem(un.getRealText());
+            nifty.gotoScreen("playerManagement");
+            //nifty.exit();
+            // controller.getGsm().setCurrentState("test");
+            // input.shutdown();
+            //input.shutdown();
+        }
+
+
+
 	   @NiftyEventSubscriber(id="userInfoCheck")
 	    public void userInfoCheck(final String id, final ButtonClickedEvent event) {
 		 //  event.getButton().
@@ -471,11 +705,25 @@ public class MenuState extends State{
 		   TextField un = nifty.getCurrentScreen().findNiftyControl("username", TextField.class);
 		   TextField psw = nifty.getCurrentScreen().findNiftyControl("password", TextField.class);
 
-		   System.out.println(un.getDisplayedText());
-		   System.out.println(un.getRealText());
-		   System.out.println(psw.getDisplayedText());
-		   System.out.println(psw.getRealText());
-		   nifty.gotoScreen("playerManagement" );
+		   Boolean loggedIn = controller.login(un.getRealText(), psw.getRealText());
+		   //System.out.println(un.getDisplayedText());
+		  // System.out.println(un.getRealText());
+		  // System.out.println(psw.getDisplayedText());
+		   //System.out.println(psw.getRealText());
+           //TODO:Implement clear list box mechanism
+		   if(loggedIn)
+		   {
+		   	System.out.println("Done!");
+               ListBox listBox = nifty.getScreen("playerManagement").findNiftyControl("avaliablePlayersListBox", ListBox.class);
+               UserResource ur = controller.getUser(un.getRealText());
+               for(PlayerResource pr : ur.getPlayers())
+               {
+                   listBox.addItem(pr.getName());
+               }
+
+			   nifty.gotoScreen("playerManagement" );
+		   }
+
 	     //nifty.exit();
 	    // controller.getGsm().setCurrentState("test");
 	    // input.shutdown();

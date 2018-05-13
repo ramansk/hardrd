@@ -51,12 +51,15 @@ public class MultiplayerGameState extends State {
 		light = new Light(new Vector3f(20000,20000,2000), new Vector3f(1,1,1));
 		masterRenderer = new MasterRenderer();
 	
+		PlayerResource pr  = controller.getPlayer(controller.getCurrentPlayerId());
 	
 	
 	
-	
-	
-		Player player = createPlayerEntity(controller.getLoader(), 2700,2700, "tree", "tree");
+		//x 2700, z 2700
+		//TODO: Add availability to sent global map row, col during player creation
+		//TODO: Add availability to change model
+		Player player = createPlayerEntity(controller.getLoader(), pr.getPosX(),pr.getPosZ(), "tree", "tree");
+		player.setName(pr.getName());
 		player.setGlobalMapColNum(1);
 		player.setGlobalMapRowNum(1);
 		Terrain terrain = new Terrain(1800, 1800, controller.getLoader(), controller.getTerrainTexturePack(), controller.getBlendMap(), controller.getMap(1,1));
@@ -79,9 +82,9 @@ public class MultiplayerGameState extends State {
 
 		Entity cube = createEntity(controller.getLoader(), terrain, 10,10,"test2", "wall");
 		entities.add(cube);
-		entities.add(createEntity(controller.getLoader(), terrain, 30,30,"stall", "stallTexture"));	
-		
-		
+		entities.add(createEntity(controller.getLoader(), terrain, 30,30,"stall", "stallTexture"));
+
+
 		applyPlayer(player);
 		applyTerrain(terrain);
 		//gsm.getState("main").applyStaticEntities(entities);
@@ -153,7 +156,7 @@ public class MultiplayerGameState extends State {
 			System.out.println(player.getPosition().x + " " + player.getPosition().z);
 			//controller.retrieveDynamicDataUpdates();
 			UpdateEventsQueue.put(new Updates(
-					"test2", 
+					player.getName(),
 					player.getPosition().x,
 					player.getPosition().y,
 					player.getPosition().z,
@@ -168,7 +171,7 @@ public class MultiplayerGameState extends State {
 		} else if(System.currentTimeMillis() > (lastUpdateTime + 500l) &&  !stopSignalSent)
 		{
 			UpdateEventsQueue.put(new Updates(
-					"test2", 
+					player.getName(),
 					player.getPosition().x,
 					player.getPosition().y,
 					player.getPosition().z,

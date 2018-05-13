@@ -34,6 +34,16 @@ public class JacksonRestClient implements Client {
 
 	}
 
+    @Override
+    public void createPlayer(Updates updates) {
+        try {
+            String res = webTarget.path("/create").request().post(Entity.json(updates)).readEntity(String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
 	@Override
 	public List<PlayerResource> getPlayersFromServer() {
 		Response response = webTarget.path("/get").request().get(Response.class);
@@ -42,6 +52,15 @@ public class JacksonRestClient implements Client {
 
 		return players;
 	}
+
+    @Override
+    public PlayerResource getPlayer(String name) {
+        Response response = webTarget.path("/getPlayer").path(name).request().get(Response.class);
+        PlayerResource player= response.readEntity(new GenericType<PlayerResource>() {
+        });
+
+        return player;
+    }
 
 	@Override
 	public MapResource getMap(int colNum, int rowNum) {
@@ -56,5 +75,37 @@ public class JacksonRestClient implements Client {
 
 		return map;
 
+	}
+
+	@Override
+	public void createUser(UserResource user)
+	{
+		try {
+			String res = webTarget.path("/user/create").request().post(Entity.json(user)).readEntity(String.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public Boolean login(String username, String password)
+	{
+		Response response = webTarget.path("/user/login").path(username).path(password).request().get(Response.class);
+		return response.readEntity(Boolean.class);
+	}
+
+	@Override
+	public UserResource getUser(String username)
+	{
+		Response response = webTarget
+				.path("/user/get").path(username)
+				//.queryParam("colNum", colNum)
+				//.queryParam("rowNum", rowNum)
+				.request()
+				.get(Response.class);
+		UserResource userData = response.readEntity(new GenericType<UserResource>() {
+		});
+
+		return userData;
 	}
 }
