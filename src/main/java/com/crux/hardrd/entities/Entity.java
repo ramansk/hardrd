@@ -7,7 +7,7 @@ import org.lwjgl.util.vector.Vector3f;
 import com.crux.hardrd.models.TexturedModel;
 
 @XmlRootElement
-public class Entity {
+public class Entity{
 	private TexturedModel model;
 	protected Vector3f position;
 	protected float rotX, rotY, rotZ;

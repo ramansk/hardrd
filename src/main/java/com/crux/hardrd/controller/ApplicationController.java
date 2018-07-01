@@ -5,6 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.nulldevice.NullSoundDevice;
+import de.lessvoid.nifty.render.batch.BatchRenderDevice;
+import de.lessvoid.nifty.renderer.lwjgl.input.LwjglInputSystem;
+import de.lessvoid.nifty.renderer.lwjgl.render.LwjglBatchRenderBackendCoreProfileFactory;
+import de.lessvoid.nifty.spi.time.impl.AccurateTimeProvider;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -30,9 +36,38 @@ public class ApplicationController {
     private String currentPlayerId;
     Loader loader = new Loader();
     FontType font;
+    LwjglInputSystem input;
 
+    public Nifty getNifty() {
+        return nifty;
+    }
+
+    public void setNifty(Nifty nifty) {
+        this.nifty = nifty;
+    }
+
+    Nifty nifty;
     public FontType getFont() {
         return font;
+    }
+
+    private LwjglInputSystem initInput() {
+        LwjglInputSystem inputSystem = new LwjglInputSystem();
+        try {
+            inputSystem.startup();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return inputSystem;
+    }
+
+    private Nifty initNifty(final LwjglInputSystem inputSystem) throws Exception {
+        return new Nifty(
+                new BatchRenderDevice(LwjglBatchRenderBackendCoreProfileFactory.create()),
+                new NullSoundDevice(),
+                inputSystem,
+                new AccurateTimeProvider());
     }
 
     public void setFont(FontType font) {
@@ -41,16 +76,12 @@ public class ApplicationController {
 
     GUIText text;
 
-    public MapResource getMap(int colNum, int rowNum) {
-        return client.getMap(colNum, rowNum);
-    }
-
     public Loader getLoader() {
         return loader;
     }
 
     private GameStateManager gsm;
-    private Client client;
+
 
     public GameStateManager getGsm() {
         return gsm;
@@ -63,66 +94,21 @@ public class ApplicationController {
     public ApplicationController() {
         TextMaster.init(loader);
         font = new FontType(loader.loadTexture("latin"), new File("res/latin.fnt"));
+        input = initInput();
+        try {
+            nifty = initNifty(input);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        nifty.loadStyleFile("nifty-default-styles.xml");
+        nifty.loadControlFile("nifty-default-controls.xml");
 
-        client = new JacksonRestClient("http://localhost:8080");
 
 
     }
 
-    TerrainTexturePack terrainTexturePack;
-    TerrainTexture blendMap;
-
-    public Boolean login(String username, String password) {
-        return client.login(username, password);
-    }
-
-    public void register(String username, String password) {
-        UserResource ur = new UserResource();
-        ur.setName(username);
-        ur.setPassword(password);
-        client.createUser(ur);
-    }
-
-    public void createPlayer(Updates u) {
-        client.createPlayer(u);
-    }
-
-    public UserResource getUser(String username) {
-        return client.getUser(username);
-    }
-
-    public TerrainTexture getBlendMap() {
-        return blendMap;
-    }
-
-    public TerrainTexturePack getTerrainTexturePack() {
-        return terrainTexturePack;
-    }
-
-    public void setTerrainTexturePack(TerrainTexturePack terrainTexturePack) {
-        this.terrainTexturePack = terrainTexturePack;
-    }
-
-    public void setBlendMap(TerrainTexture blendMap) {
-        this.blendMap = blendMap;
-    }
-
-    //add action response
+       //add action response
     public void loadResources() {
-        //load static resources action
-        //load dynamic resources action
-
-
-        TerrainTexture bt = new TerrainTexture(loader.loadTexture("grass"));
-        TerrainTexture r = new TerrainTexture(loader.loadTexture("dirt"));
-        TerrainTexture g = new TerrainTexture(loader.loadTexture("pinkFlowers"));
-        TerrainTexture b = new TerrainTexture(loader.loadTexture("path"));
-        terrainTexturePack = new TerrainTexturePack(bt, r, g, b);
-        blendMap = new TerrainTexture(loader.loadTexture("blendMap"));
-
-
-        //ActionResponse response = new ActionResponse();
-        //response.setState("main");
         gsm = new GameStateManager(this);
     }
 
@@ -130,18 +116,6 @@ public class ApplicationController {
         gsm.getCurrentState().update();
         DisplayManager.update();
         gsm.getCurrentState().draw();
-    }
-
-    public void sendUpdatesToServer(Updates updates) {
-        client.sendUpdatesToServer(updates);
-    }
-
-    public List<PlayerResource> getPlayers() {
-        return client.getPlayersFromServer();
-    }
-
-    public PlayerResource getPlayer(String name) {
-        return client.getPlayer(name);
     }
 
     public String getCurrentPlayerId() {

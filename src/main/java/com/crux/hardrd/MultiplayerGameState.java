@@ -7,13 +7,11 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.crux.hardrd.controller.*;
+import com.crux.hardrd.textures.TerrainTexture;
+import com.crux.hardrd.textures.TerrainTexturePack;
 import org.lwjgl.util.vector.Vector3f;
 
-import com.crux.hardrd.controller.ApplicationController;
-import com.crux.hardrd.controller.MapResource;
-import com.crux.hardrd.controller.PlayerResource;
-import com.crux.hardrd.controller.ServerUpdateJob;
-import com.crux.hardrd.controller.UpdateEventsQueue;
 import com.crux.hardrd.entities.Camera;
 import com.crux.hardrd.entities.DynamicEntity;
 import com.crux.hardrd.entities.Entity;
@@ -28,7 +26,9 @@ import com.crux.hardrd.test.OBJLoader;
 import com.crux.hardrd.textures.ModelTexture;
 
 public class MultiplayerGameState extends State {
-	
+
+	private Client client;
+
 	private List<Entity> entities = new ArrayList<>();
 	private Player player;
 	private Camera camera;
@@ -44,14 +44,25 @@ public class MultiplayerGameState extends State {
     private ServerUpdateJob job;
     private OtherPlayersUpdateJob opuJob;
 
-	public MultiplayerGameState(ApplicationController controller) {
+	public MultiplayerGameState(ApplicationController controller, Client client) {
 		super(controller);
-		job = new ServerUpdateJob(controller);
-		opuJob = new OtherPlayersUpdateJob(otherPlayers, controller, playersToAdd, mapsToAdd);
+		this.client = client;
+		TerrainTexture bt = new TerrainTexture(controller.getLoader().loadTexture("grass"));
+		TerrainTexture r = new TerrainTexture(controller.getLoader().loadTexture("dirt"));
+		TerrainTexture g = new TerrainTexture(controller.getLoader().loadTexture("pinkFlowers"));
+		TerrainTexture b = new TerrainTexture(controller.getLoader().loadTexture("path"));
+
+		terrainTexturePack = new TerrainTexturePack(bt, r, g, b);
+		blendMap = new TerrainTexture(controller.getLoader().loadTexture("blendMap"));
+
+			job = new ServerUpdateJob(controller);
+			opuJob = new OtherPlayersUpdateJob(otherPlayers, controller, playersToAdd, mapsToAdd);
+
+
 		light = new Light(new Vector3f(20000,20000,2000), new Vector3f(1,1,1));
 		masterRenderer = new MasterRenderer();
 	
-		PlayerResource pr  = controller.getPlayer(controller.getCurrentPlayerId());
+		PlayerResource pr  = client.getPlayer(controller.getCurrentPlayerId());
 	
 	
 	
@@ -62,7 +73,7 @@ public class MultiplayerGameState extends State {
 		player.setName(pr.getName());
 		player.setGlobalMapColNum(1);
 		player.setGlobalMapRowNum(1);
-		Terrain terrain = new Terrain(1800, 1800, controller.getLoader(), controller.getTerrainTexturePack(), controller.getBlendMap(), controller.getMap(1,1));
+		Terrain terrain = new Terrain(1800, 1800, controller.getLoader(), getTerrainTexturePack(), getBlendMap(), client.getMap(1,1));
 
 		
 		
@@ -118,7 +129,7 @@ public class MultiplayerGameState extends State {
 				System.out.println("!!!!!!!!" + mr.getCol() + " " + mr.getRow() + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				System.out.println("!!!!!!!!" + mr.getCol()*Terrain.SIZE + " " + (mr.getRow())*Terrain.SIZE + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-				terrains.put(TerrainKey.create(mr.getCol(), mr.getRow()),new Terrain((mr.getCol())*Terrain.SIZE, (mr.getRow())*Terrain.SIZE, controller.getLoader(), controller.getTerrainTexturePack(), controller.getBlendMap(), mr));
+				terrains.put(TerrainKey.create(mr.getCol(), mr.getRow()),new Terrain((mr.getCol())*Terrain.SIZE, (mr.getRow())*Terrain.SIZE, controller.getLoader(), getTerrainTexturePack(), getBlendMap(), mr));
 				mapsToAdd.remove(mr);
 			}
 		}
@@ -251,4 +262,25 @@ public class MultiplayerGameState extends State {
     	return new Player(tm, new Vector3f(x,0,z), 0, 90, 0, 1);
     	
     }
+
+	TerrainTexturePack terrainTexturePack;
+	TerrainTexture blendMap;
+
+	public TerrainTexture getBlendMap() {
+		return blendMap;
+	}
+
+	public TerrainTexturePack getTerrainTexturePack() {
+		return terrainTexturePack;
+	}
+
+	public void setTerrainTexturePack(TerrainTexturePack terrainTexturePack) {
+		this.terrainTexturePack = terrainTexturePack;
+	}
+
+	public void setBlendMap(TerrainTexture blendMap) {
+		this.blendMap = blendMap;
+	}
+
+
 }

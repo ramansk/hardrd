@@ -3,6 +3,7 @@ package com.crux.hardrd;
 import java.io.File;
 import java.util.List;
 
+import com.crux.hardrd.controller.Client;
 import com.crux.hardrd.controller.PlayerResource;
 import com.crux.hardrd.controller.UserResource;
 import de.lessvoid.nifty.controls.ListBox;
@@ -52,33 +53,29 @@ import de.lessvoid.nifty.tools.SizeValue;
 //TODO: Refactor class
 //TODO: Add "back" flow
 public class MenuState extends State{
-	private static final float SKY_R = 0.5f;
-	private static final float SKY_G = 0.5f;
-	private static final float SKY_B = 1.5f;
-	GUIText singlePlayer;
-	GUIText multiPlayer;
-	private Light light;
-	private Camera camera;
+	//private static final float SKY_R = 0.5f;
+	//private static final float SKY_G = 0.5f;
+	//private static final float SKY_B = 1.5f;
+	//GUIText singlePlayer;
+	//GUIText multiPlayer;
+	//private Light light;
+	private Client client;
+	//private Camera camera;
 	 private MasterRenderer masterRenderer;
-	 LwjglInputSystem input;
 	 Nifty nifty;
-	public MenuState(ApplicationController controller) {
+	public MenuState(ApplicationController controller, Client client) {
 		super(controller);
-		singlePlayer = new GUIText("Single player",1f,controller.getFont(),new Vector2f(0.45f,0.4f),0.5f, false);
-		multiPlayer = new GUIText("Multiplayer",1f,controller.getFont(),new Vector2f(0.45f,0.5f),0.5f, false);
-		masterRenderer = new MasterRenderer();
-		light = new Light(new Vector3f(20000,20000,2000), new Vector3f(1,1,1));
+
+		this.nifty = controller.getNifty();
+		this.client = client;
+		//singlePlayer = new GUIText("Single player",1f,controller.getFont(),new Vector2f(0.45f,0.4f),0.5f, false);
+		//multiPlayer = new GUIText("Multiplayer",1f,controller.getFont(),new Vector2f(0.45f,0.5f),0.5f, false);
+		//masterRenderer = new MasterRenderer();
+		//light = new Light(new Vector3f(20000,20000,2000), new Vector3f(1,1,1));
 	
 	
 	
-		input = initInput();
-		try {
-			nifty = initNifty(input);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		 nifty.loadStyleFile("nifty-default-styles.xml");
-		 nifty.loadControlFile("nifty-default-controls.xml");
+
 		 createMainScreen(nifty, new MyScreenController());
 		 serverConnectOperationsScreen(nifty, new MyScreenController());
 		 chooseServerOperationsScreen(nifty, new MyScreenController());
@@ -121,6 +118,7 @@ public class MenuState extends State{
 		            height(SizeValue.px(10));
 		          }});
 		          control(new ButtonBuilder("singleplayer", "Single Player") {{
+
 		            alignCenter();
 		            valignCenter();
 		          }});
@@ -488,25 +486,6 @@ public class MenuState extends State{
             }});
         }}.build(nifty);
     }
-	
-	 private LwjglInputSystem initInput() {
-		    LwjglInputSystem inputSystem = new LwjglInputSystem();
-		    try {
-				inputSystem.startup();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		    return inputSystem;
-		  }
-	
-	private Nifty initNifty(final LwjglInputSystem inputSystem) throws Exception {
-	    return new Nifty(
-	        new BatchRenderDevice(LwjglBatchRenderBackendCoreProfileFactory.create()),
-	        new NullSoundDevice(),
-	        inputSystem,
-	        new AccurateTimeProvider());
-	  }
 
 	@Override
 	public void update() {
@@ -564,6 +543,7 @@ public class MenuState extends State{
 		
 		//TextMaster.cleanUp();
 	}
+
 	public class MyScreenController extends DefaultScreenController {
 
 	   @NiftyEventSubscriber(id="multiplayer")
@@ -589,9 +569,9 @@ public class MenuState extends State{
 	
 	   @NiftyEventSubscriber(id="singleplayer")
 	    public void singleplayer(final String id, final ButtonClickedEvent event) {
-	    
+		   controller.getGsm().setCurrentState("singlePlayer");
 		   System.out.println("Single Player");
-	     //nifty.exit();
+	    // nifty.exit();
 	    // controller.getGsm().setCurrentState("test");
 	    // input.shutdown();
 	     //input.shutdown();
@@ -667,9 +647,11 @@ public class MenuState extends State{
 
             TextField psw = nifty.getCurrentScreen().findNiftyControl("password", TextField.class);
             TextField pswRepeat = nifty.getCurrentScreen().findNiftyControl("password", TextField.class);
+			UserResource ur = new UserResource();
+			ur.setName(un.getRealText());
+			ur.setPassword(psw.getRealText());
+			client.createUser(ur);
 
-
-            controller.register(un.getRealText(), psw.getRealText());
             nifty.gotoScreen("serverLogIn");
             //nifty.exit();
             // controller.getGsm().setCurrentState("test");
@@ -686,7 +668,7 @@ public class MenuState extends State{
             Updates u = new Updates(un.getRealText(), 2700f,0f,2700f,0f,0f,0f, 0f);
             u.setUsername(nifty.getScreen("serverLogIn").findNiftyControl("username", TextField.class).getRealText());
             System.out.println(nifty.getScreen("serverLogIn").findNiftyControl("username", TextField.class).getRealText());
-            controller.createPlayer(u);
+            client.createPlayer(u);
             ListBox listBox = nifty.getScreen("playerManagement").findNiftyControl("avaliablePlayersListBox", ListBox.class);
             listBox.addItem(un.getRealText());
             nifty.gotoScreen("playerManagement");
@@ -705,7 +687,7 @@ public class MenuState extends State{
 		   TextField un = nifty.getCurrentScreen().findNiftyControl("username", TextField.class);
 		   TextField psw = nifty.getCurrentScreen().findNiftyControl("password", TextField.class);
 
-		   Boolean loggedIn = controller.login(un.getRealText(), psw.getRealText());
+		   Boolean loggedIn = client.login(un.getRealText(), psw.getRealText());
 		   //System.out.println(un.getDisplayedText());
 		  // System.out.println(un.getRealText());
 		  // System.out.println(psw.getDisplayedText());
@@ -715,7 +697,7 @@ public class MenuState extends State{
 		   {
 		   	System.out.println("Done!");
                ListBox listBox = nifty.getScreen("playerManagement").findNiftyControl("avaliablePlayersListBox", ListBox.class);
-               UserResource ur = controller.getUser(un.getRealText());
+               UserResource ur = client.getUser(un.getRealText());
                for(PlayerResource pr : ur.getPlayers())
                {
                    listBox.addItem(pr.getName());

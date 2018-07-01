@@ -7,6 +7,7 @@ public class ServerUpdateJob {
 	private static final int WORKERS_COUNT = 1;
 	private boolean running = true;
 	private ApplicationController controller;
+	private Client client;
 	ExecutorService es;
 
 	public ServerUpdateJob(ApplicationController controller) {
@@ -22,7 +23,7 @@ public class ServerUpdateJob {
 		@Override
 		public void run() {
 			while (running) {
-				controller.sendUpdatesToServer(UpdateEventsQueue.get());
+				client.sendUpdatesToServer(UpdateEventsQueue.get());
 			}
 		}
 	}

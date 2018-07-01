@@ -18,7 +18,7 @@ import com.crux.hardrd.toolbox.Maths;
 
 public class Terrain {
 	public static final float SIZE = 1800;
-	private static final float MAX_HEIGHT = 40;
+	private static final float MAX_HEIGHT = 150;
 	private static final float MAX_PIXEL_COLOUR = 256*256*256;
 	
 	private int row;
@@ -142,8 +142,7 @@ public class Terrain {
 	private RawModel generateTerrain(Loader loader, String heightMap){
 		
 		BufferedImage image = null;
-		
-		
+
 		try {
 			image = ImageIO.read(new File("res/" + heightMap + ".png"));
 		} catch (IOException e) {

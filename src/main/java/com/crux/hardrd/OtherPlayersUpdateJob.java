@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.crux.hardrd.controller.Client;
 import org.lwjgl.util.vector.Vector3f;
 
 import com.crux.hardrd.controller.ApplicationController;
@@ -15,6 +16,7 @@ import com.crux.hardrd.entities.Player;
 import com.crux.hardrd.terrains.Terrain;
 
 public class OtherPlayersUpdateJob {
+	private Client client;
 	private Map<String, DynamicEntity> othPlayers;
 	private List<PlayerResource> playersToAdd;
 	private List<MapResource> loadedMaps;
@@ -61,13 +63,13 @@ public class OtherPlayersUpdateJob {
 
 							if (curPlayer.getPosition().x > Terrain.SIZE * (curPlayer.getGlobalMapColNum() + 1)
 									- Terrain.SIZE / 5 && !cloaded) {
-								loadedMaps.add(controller.getMap(curPlayer.getGlobalMapColNum() + 1,
+								loadedMaps.add(client.getMap(curPlayer.getGlobalMapColNum() + 1,
 										curPlayer.getGlobalMapRowNum()));
 								cloaded = true;
 							}
 							if (curPlayer.getPosition().z > Terrain.SIZE * (curPlayer.getGlobalMapRowNum() + 1)
 									- Terrain.SIZE / 5 && !rloaded) {
-								loadedMaps.add(controller.getMap(curPlayer.getGlobalMapColNum(),
+								loadedMaps.add(client.getMap(curPlayer.getGlobalMapColNum(),
 										curPlayer.getGlobalMapRowNum() + 1));
 								rloaded = true;
 
@@ -75,13 +77,13 @@ public class OtherPlayersUpdateJob {
 
 							if (curPlayer.getPosition().x < Terrain.SIZE * (curPlayer.getGlobalMapColNum())
 									+ Terrain.SIZE / 5 && !ncloaded) {
-								loadedMaps.add(controller.getMap(curPlayer.getGlobalMapColNum() - 1,
+								loadedMaps.add(client.getMap(curPlayer.getGlobalMapColNum() - 1,
 										curPlayer.getGlobalMapRowNum()));
 								ncloaded = true;
 							}
 							if (curPlayer.getPosition().z < Terrain.SIZE * (curPlayer.getGlobalMapRowNum())
 									+ Terrain.SIZE / 5 && !nrloaded) {
-								loadedMaps.add(controller.getMap(curPlayer.getGlobalMapColNum(),
+								loadedMaps.add(client.getMap(curPlayer.getGlobalMapColNum(),
 										curPlayer.getGlobalMapRowNum() - 1));
 								nrloaded = true;
 							}
@@ -119,7 +121,7 @@ public class OtherPlayersUpdateJob {
 						}
 					}
 
-					List<PlayerResource> playersList = controller.getPlayers();
+					List<PlayerResource> playersList = client.getPlayersFromServer();
 					if (playersList != null) {
 						for (PlayerResource p : playersList) {
 							DynamicEntity currentPlayer = othPlayers.get(p.getName());
